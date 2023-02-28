@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Produtos {
+  id        Int      @id @default(autoincrement())
+  descricao      String
+  nomeEtiqueta String?
+  preco     Float
+  estoque   Float
+  estoqueMinimo Float?
+  unidades  String?
+  idCategoria Int
+  promocao Boolean
+  precoPromocao Float?
+  categoria Categorias? @relation(fields: [idCategoria], references: [id])
+  itVendas  itVendas[]
+  imagem    String?
+  color String?
+  isFavorite Boolean?
+  networkImage Boolean?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Categorias{
+  id        Int      @id @default(autoincrement())
+  nome      String
+  produtos  Produtos[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model itVendas{
+  id        Int      @id @default(autoincrement())
+  idVenda   Int      @unique
+  venda   Vendas @relation(fields: [idVenda], references: [id])
+  idProduto Int @unique
+  produto Produtos @relation(fields: [idProduto], references: [id])
+  desconto Float
+  quantidade Float
+  valorUnitario Float
+  total Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vendas{
+  id        Int      @id @default(autoincrement())
+  data      DateTime
+  hora      DateTime
+  descontoTotal Float
+  valorTotal Float
+  itVendas  itVendas[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Configuracoes{
+  id        Int      @id @default(autoincrement())
+  bloquearSemEstoque Boolean?
+  avisarSemEstoque Boolean?
+  avisarEstoqueMinimo Boolean?
+  bloquearEstoqueMinimo Boolean?
+  versao String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

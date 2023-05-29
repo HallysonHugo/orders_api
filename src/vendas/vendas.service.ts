@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { itVendas, PrismaClient, Vendas } from '@prisma/client';
+import { Ficha, itVendas, PrismaClient, Vendas } from '@prisma/client';
 
 const prisma = new PrismaClient();
 @Injectable()
@@ -16,6 +16,23 @@ export class VendasService {
             },
         });
     }
+
+    
+    async createFicha(vendaItens: itVendas[]){
+        vendaItens.forEach(async (itVenda) => {
+            for(let i = 0; i < itVenda.quantidade; i++){
+                const codigoFicha:string = itVenda.id.toString() + itVenda.idVenda.toString() + itVenda.idProduto.toString() + i.toString();
+                await prisma.ficha.create({
+                    data: {
+                        codigoFicha: codigoFicha.padStart(10, '0'),
+                        codigoItVendas: itVenda.idVenda,
+                        codigoProduto: itVenda.idProduto,
+                        retirado: false,
+                    },
+                });
+            }
+        });
+    }
     
 
     async setVenda(venda: Vendas, itens: itVendas[]) {
@@ -28,6 +45,7 @@ export class VendasService {
             },
         });
         await this.setItVenda(itens, venda.id);
+        await this.createFicha(itens);
     }
 
     async updateVenda(id: number, venda: Vendas) {
@@ -112,5 +130,28 @@ export class VendasService {
                 estoque: produto.estoque - quantidade,
             },
         });
+    }
+
+    async retirarProduto(codigoFicha:string){
+        try{
+            const ficha:Ficha = await prisma.ficha.findUnique({
+                where: {
+                    codigoFicha: codigoFicha,
+                },
+            });
+            
+            await prisma.ficha.update({
+                where: {
+                   id : ficha.id, 
+                },
+                data: {
+                    retirado: true,
+                },
+            });
+            await this.updateEstoque(ficha.codigoProduto, 1);
+        }
+        catch(e){
+            throw e;
+        }
     }
 }

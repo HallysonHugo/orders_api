@@ -55,14 +55,16 @@ export class ProdutosService {
       }
     
     
-      async getProdutos(id: number) {
-        const produtos = await prisma.produtos.findUnique({
-          where: {
-            id: id,
-          },
-        });
-        return produtos;
-      }
+      // async getProdutos(id: number) {
+      //   const produtos = await prisma.produtos.findUnique({
+      //     where: {
+      //       id: id,
+      //     },
+      //   });
+      //   return produtos;
+      // }
+
+
       async updateProdutos(id: number, produtos: Produtos) {
         const lcto = await prisma.produtos.update({
           where: {
@@ -90,4 +92,21 @@ export class ProdutosService {
         });
         return lcto;
       }
+
+
+     async searchProducts(search: string) : Promise<Produtos[]> {
+      try{
+        const produtos = await prisma.produtos.findMany({
+          where: {
+            descricao: {
+              equals: search,
+            },
+          },
+        });
+        return produtos;
+      }
+      catch(error){
+        throw error;
+      }
+    }
 }

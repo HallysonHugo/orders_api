@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { Produtos } from '@prisma/client';
+import { get } from 'http';
 import { ProdutosService } from './produtos.service';
 
 @Controller('produtos')
@@ -23,11 +24,11 @@ export class ProdutosController {
       return produtos;
     }
   
-    @Get(':id')
-    async getProdutosId(id: number) {
-      const produtos = await this.produtosService.getProdutos(id);
-      return produtos;
-    }
+    // @Get(':id')
+    // async getProdutosId(id: number) {
+    //   const produtos = await this.produtosService.getProdutos(id);
+    //   return produtos;
+    // }
   
     @Put(':id')
     async updateProdutos(id: number, produto: Produtos) {
@@ -47,5 +48,17 @@ export class ProdutosController {
       const idProduto : number = +id;
       const produtos = await this.produtosService.deleteProdutos(idProduto);
       return produtos;
+    }
+
+
+    @Get('/search')
+    async searchProducts(@Query() search:{search:string}) {
+      try{
+        const produtos = await this.produtosService.searchProducts(search.search);
+        return produtos;
+      }
+      catch(error){
+        throw "Erro Ao buscar o produtos";
+      }
     }
 }

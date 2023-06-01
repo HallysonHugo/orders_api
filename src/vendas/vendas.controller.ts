@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
 import { itVendas, Vendas } from '@prisma/client';
 import { VendasService } from './vendas.service';
 
@@ -25,8 +25,9 @@ export class VendasController {
     }
 
     @Post()
-    async setVenda(venda: Vendas, itens: itVendas[]) {
-        const vendas = await this.vendasService.setVenda(venda, itens);
+    async setVenda(@Body() venda) {;
+    
+        const vendas = await this.vendasService.setVenda(venda);
         return vendas;
     }
 

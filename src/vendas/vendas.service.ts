@@ -28,6 +28,7 @@ export class VendasService {
                         codigoItVendas: itVenda.idVenda,
                         codigoProduto: itVenda.idProduto,
                         retirado: false,
+                        dataVenda:  Date.now().toString(),
                     },
                 });
             }
@@ -35,17 +36,26 @@ export class VendasService {
     }
     
 
-    async setVenda(venda: Vendas, itens: itVendas[]) {
-        await prisma.vendas.create({
-            data: {
-                hora: venda.hora,
-                valorTotal: venda.valorTotal,
-                descontoTotal: venda.descontoTotal,
-                data: venda.data,
-            },
-        });
-        await this.setItVenda(itens, venda.id);
-        await this.createFicha(itens);
+    async setVenda(venda:any) {
+
+        try{
+            await prisma.vendas.create({
+                data: {
+                    hora: venda.hora,
+                    valorTotal: venda.valorTotal,
+                    descontoTotal: venda.descontoTotal,
+                    data: venda.data,
+                    idCliente: venda.idCliente,    
+                },
+            });
+            await this.setItVenda(venda.produtos, venda.id);
+            await this.createFicha(venda.produtos);
+        }
+        catch(e){
+            console.log(e)
+            throw e;
+        }
+       
     }
 
     async updateVenda(id: number, venda: Vendas) {

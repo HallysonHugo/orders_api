@@ -98,9 +98,21 @@ export class ProdutosService {
       try{
         const produtos = await prisma.produtos.findMany({
           where: {
-            descricao: {
-              equals: search,
+            id: {
+              equals : +search,
             },
+            OR: [
+              {
+                descricao: {
+                  contains: search,
+                },
+              },
+              {
+                nomeEtiqueta: {
+                  contains: search,
+                },
+              },
+            ],
           },
         });
         return produtos;

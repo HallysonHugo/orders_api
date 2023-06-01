@@ -56,8 +56,10 @@ model itVendas{
 
 model Vendas{
   id        Int      @id @default(autoincrement())
-  data      DateTime
-  hora      DateTime
+  data      String
+  hora      String
+  clienteModel Clientes @relation(fields: [id], references: [id])
+  idCliente Int
   descontoTotal Float
   valorTotal Float
   itVendas  itVendas[]
@@ -76,9 +78,41 @@ model Configuracoes{
   updatedAt DateTime @updatedAt
 }
 
+model Pessoas{
+  id       Int      @id @default(autoincrement())
+  nome     String
+  cpf      String
+  endereco String
+  telefone String
+  email    String
+  funcionario Funcionarios[]
+  clientes Clientes[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Clientes{
+  id       Int      @id @default(autoincrement())
+  pessoasModel Pessoas @relation(fields: [id], references: [id])
+  idPessoas Int
+  vendas Vendas[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Funcionarios{
+  id       Int      @id @default(autoincrement())
+  pessoasModel Pessoas @relation(fields: [id], references: [id])
+  idPessoas Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Ficha{
   id       Int      @id @default(autoincrement())
   codigoFicha String @unique
+  dataVenda String
   itVendasModel itVendas @relation(fields: [id], references: [id])
   codigoItVendas Int  @unique
   codigoProduto Int @unique

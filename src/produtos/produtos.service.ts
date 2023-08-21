@@ -53,22 +53,11 @@ export class ProdutosService {
         const produtos = await prisma.produtos.findMany();
         return produtos;
       }
-    
-    
-      // async getProdutos(id: number) {
-      //   const produtos = await prisma.produtos.findUnique({
-      //     where: {
-      //       id: id,
-      //     },
-      //   });
-      //   return produtos;
-      // }
 
-
-      async updateProdutos(id: number, produtos: Produtos) {
+      async updateProdutos(produtos: Produtos) {
         const lcto = await prisma.produtos.update({
           where: {
-            id: id,
+            id: produtos.id,
           },
           data: {
             descricao: produtos.descricao,

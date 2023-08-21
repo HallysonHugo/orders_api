@@ -24,7 +24,7 @@ export class VendasService {
                 const codigoFicha:string = itVenda.id.toString() + itVenda.idVenda.toString() + itVenda.idProduto.toString() + i.toString();
                 await prisma.ficha.create({
                     data: {
-                        codigoFicha: codigoFicha.padStart(10, '0'),
+                        codigoFicha: codigoFicha.padStart(5, '0'),
                         codigoItVendas: itVenda.idVenda,
                         codigoProduto: itVenda.idProduto,
                         retirado: false,
@@ -36,8 +36,7 @@ export class VendasService {
     }
     
 
-    async setVenda(venda:any) {
-
+    async setVenda(venda:Vendas, itens:itVendas[]) {
         try{
             await prisma.vendas.create({
                 data: {
@@ -45,11 +44,12 @@ export class VendasService {
                     valorTotal: venda.valorTotal,
                     descontoTotal: venda.descontoTotal,
                     data: venda.data,
-                    idCliente: venda.idCliente,    
+                    idCliente: 1,
+                    idFuncionario: 1,
                 },
             });
-            await this.setItVenda(venda.produtos, venda.id);
-            await this.createFicha(venda.produtos);
+            await this.setItVenda(itens, venda.id);
+            await this.createFicha(itens);
         }
         catch(e){
             console.log(e)

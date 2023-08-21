@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { Produtos } from '@prisma/client';
-import { get } from 'http';
 import { ProdutosService } from './produtos.service';
 
 @Controller('produtos')
@@ -30,9 +29,9 @@ export class ProdutosController {
     //   return produtos;
     // }
   
-    @Put(':id')
-    async updateProdutos(id: number, produto: Produtos) {
-      const produtos = await this.produtosService.updateProdutos(id, produto);
+    @Put()
+    async updateProdutos(@Body() produto: Produtos) {
+      const produtos = await this.produtosService.updateProdutos(produto);
       return produtos;
     }
 

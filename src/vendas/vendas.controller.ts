@@ -25,9 +25,9 @@ export class VendasController {
     }
 
     @Post()
-    async setVenda(@Body() venda) {;
-    
-        const vendas = await this.vendasService.setVenda(venda);
+    async setVenda(@Body('venda') venda:Vendas, @Body('produto') itens:itVendas[]) {;
+        
+        const vendas = await this.vendasService.setVenda(venda,itens);
         return vendas;
     }
 

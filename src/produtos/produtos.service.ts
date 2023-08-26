@@ -50,7 +50,11 @@ export class ProdutosService {
     
       
       async getAllProdutos() {
-        const produtos = await prisma.produtos.findMany();
+        const produtos = await prisma.produtos.findMany({
+          include: {
+            categoria : true
+          }
+        });
         return produtos;
       }
 
@@ -86,22 +90,13 @@ export class ProdutosService {
      async searchProducts(search: string) : Promise<Produtos[]> {
       try{
         const produtos = await prisma.produtos.findMany({
+          include: {
+            categoria : true
+          },
           where: {
-            id: {
-              equals : +search,
+           descricao: {
+              contains: search,
             },
-            OR: [
-              {
-                descricao: {
-                  contains: search,
-                },
-              },
-              {
-                nomeEtiqueta: {
-                  contains: search,
-                },
-              },
-            ],
           },
         });
         return produtos;

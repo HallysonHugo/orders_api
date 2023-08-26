@@ -17,12 +17,6 @@ export class ProdutosController {
       }
     }
   
-    @Get()
-    async getProdutos() {
-      const produtos = await this.produtosService.getAllProdutos();
-      return produtos;
-    }
-  
     // @Get(':id')
     // async getProdutosId(id: number) {
     //   const produtos = await this.produtosService.getProdutos(id);
@@ -50,10 +44,14 @@ export class ProdutosController {
     }
 
 
-    @Get('/search')
-    async searchProducts(@Query() search:{search:string}) {
+    @Get()
+    async searchProducts(@Query('search') search:string) {
       try{
-        const produtos = await this.produtosService.searchProducts(search.search);
+        if(search == undefined || search == null || search == ""){
+          const produtos = await this.produtosService.getAllProdutos();
+          return produtos;
+        }
+        const produtos = await this.produtosService.searchProducts(search);
         return produtos;
       }
       catch(error){

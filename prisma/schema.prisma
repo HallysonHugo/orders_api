@@ -41,26 +41,27 @@ model Categorias{
 
 model itVendas{
   id        Int      @id @default(autoincrement())
-  idVenda   Int      @unique
+  idVenda   Int   
   venda   Vendas @relation(fields: [idVenda], references: [id])
-  idProduto Int @unique
-  produto Produtos @relation(fields: [idProduto], references: [id])
-  ficha Ficha[]
+  idProduto Int 
+  produto Produtos? @relation(fields: [idProduto], references: [id])
+  ficha Ficha? @relation(fields: [idFicha], references: [id])
+  idFicha Int?
   desconto Float
   quantidade Float
   valorUnitario Float
   total Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([idVenda, idProduto])
 }
 
 model Vendas{
   id        Int      @id @default(autoincrement())
-  data      String
-  hora      String
-  clienteModel Clientes @relation(fields: [idCliente], references: [id])
+  clienteModel Clientes? @relation(fields: [idCliente], references: [id])
   idCliente Int
-  funcionarioModel Funcionarios @relation(fields: [idFuncionario], references: [id])
+  funcionarioModel Funcionarios? @relation(fields: [idFuncionario], references: [id])
   idFuncionario Int
   descontoTotal Float
   valorTotal Float
@@ -114,10 +115,12 @@ model Funcionarios{
 
 model Ficha{
   id       Int      @id @default(autoincrement()) 
-  codigoFicha String @unique
   dataVenda String
-  itVendasModel itVendas @relation(fields: [id], references: [id])
-  codigoItVendas Int  @unique
-  codigoProduto Int @unique
+  itVendas itVendas[]
+  codigoItVendas Int  
+  codigoProduto Int 
   retirado Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([codigoItVendas, codigoProduto])
 }

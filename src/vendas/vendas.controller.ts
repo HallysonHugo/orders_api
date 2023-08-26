@@ -25,8 +25,9 @@ export class VendasController {
     }
 
     @Post()
-    async setVenda(@Body('venda') venda:Vendas, @Body('produto') itens:itVendas[]) {;
-        
+    async setVenda(@Body('venda') venda:Vendas, @Body('produtos') itens:itVendas[]) {;
+        console.log(venda);
+        console.log(itens);
         const vendas = await this.vendasService.setVenda(venda,itens);
         return vendas;
     }
@@ -36,4 +37,4 @@ export class VendasController {
         const vendas = await this.vendasService.deleteVenda(id);
         return vendas;
     }
-}
+}   

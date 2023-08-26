@@ -6,7 +6,15 @@ const prisma = new PrismaClient();
 export class VendasService {
 
     async getVendas() {
-        return prisma.vendas.findMany();
+        return prisma.vendas.findMany({
+            include:{
+                itVendas: {
+                    include:{
+                        ficha: true,
+                    }
+                },
+            },
+        });
     }
 
     async getVenda(id: number) {
@@ -18,38 +26,56 @@ export class VendasService {
     }
 
     
-    async createFicha(vendaItens: itVendas[]){
-        vendaItens.forEach(async (itVenda) => {
-            for(let i = 0; i < itVenda.quantidade; i++){
-                const codigoFicha:string = itVenda.id.toString() + itVenda.idVenda.toString() + itVenda.idProduto.toString() + i.toString();
-                await prisma.ficha.create({
-                    data: {
-                        codigoFicha: codigoFicha.padStart(5, '0'),
-                        codigoItVendas: itVenda.idVenda,
-                        codigoProduto: itVenda.idProduto,
-                        retirado: false,
-                        dataVenda:  Date.now().toString(),
-                    },
-                });
-            }
-        });
+    async createFicha(venda:Vendas, vendaItens: itVendas[]):Promise<itVendas[]>{
+        const newListItVendas:itVendas[] = [];
+        for(const itVenda of vendaItens){
+            const ficha = await prisma.ficha.create({
+                data: {
+                    codigoItVendas: itVenda.idVenda,
+                    codigoProduto: itVenda.idProduto,
+                    retirado: false,
+                    dataVenda: Date.now().toString(),
+                },
+            });
+            const newItVenda = await prisma.itVendas.update({
+                include:{
+                    ficha: true,
+                },
+                where: {
+                    id: itVenda.id,
+                },
+                data: {
+                    idFicha: ficha.id,
+                },
+            });
+            newListItVendas.push(newItVenda);
+        }
+        return newListItVendas;
     }
     
 
     async setVenda(venda:Vendas, itens:itVendas[]) {
         try{
-            await prisma.vendas.create({
+           const newVenda =  await prisma.vendas.create({
+                include:{
+                    itVendas: true
+                },
                 data: {
-                    hora: venda.hora,
                     valorTotal: venda.valorTotal,
                     descontoTotal: venda.descontoTotal,
-                    data: venda.data,
-                    idCliente: 1,
-                    idFuncionario: 1,
+                    idCliente: venda.idCliente,
+                    idFuncionario: venda.idFuncionario,
+                    itVendas: {
+                        createMany: {
+                            data: itens,
+                        },
+                    },
+
                 },
             });
-            await this.setItVenda(itens, venda.id);
-            await this.createFicha(itens);
+            const itVendas:itVendas[] =  await this.createFicha(newVenda, newVenda.itVendas);
+            newVenda.itVendas = itVendas;
+            return newVenda;
         }
         catch(e){
             console.log(e)
@@ -64,8 +90,8 @@ export class VendasService {
                 id: id,
             },
             data: {
-                data: venda.data,
-                hora: venda.hora,
+                idCliente: venda.idCliente,
+                idFuncionario: venda.idFuncionario,
                 valorTotal: venda.valorTotal,
                 descontoTotal: venda.descontoTotal,
             },
@@ -74,7 +100,7 @@ export class VendasService {
 
     async updateItVenda(idVenda: number, itVenda: itVendas[]) {
         itVenda.forEach(async (itVenda) => {
-            await prisma.itVendas.update({
+            await prisma.itVendas.updateMany({
                 where: {
                     idVenda: idVenda,
                     idProduto: itVenda.idProduto,
@@ -103,7 +129,7 @@ export class VendasService {
     }
 
     async getItVenda(idVenda: number){
-        return prisma.itVendas.findUnique({
+        return prisma.itVendas.findMany({
             where: {
                 idVenda: idVenda,
             },
@@ -118,9 +144,9 @@ export class VendasService {
     }
 
     async deleteItVenda(idVenda: number, idProduto: number) {
-        return prisma.itVendas.delete({
+        return prisma.itVendas.deleteMany({
             where: {
-                idVenda: idVenda,
+               idVenda : idVenda,
                 idProduto: idProduto,
             },
         });
@@ -142,11 +168,11 @@ export class VendasService {
         });
     }
 
-    async retirarProduto(codigoFicha:string){
+    async retirarProduto(codigoFicha: number){
         try{
             const ficha:Ficha = await prisma.ficha.findUnique({
                 where: {
-                    codigoFicha: codigoFicha,
+                    id: codigoFicha,
                 },
             });
             

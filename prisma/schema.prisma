@@ -66,6 +66,7 @@ model Vendas{
   descontoTotal Float
   valorTotal Float
   itVendas  itVendas[]
+  formaPagamentoVenda FormaPagamentoVenda[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -123,4 +124,24 @@ model Ficha{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@unique([codigoItVendas, codigoProduto])
+}
+
+
+model FormaPagamento{
+  id       Int      @id @default(autoincrement())
+  nome     String
+  formaPagamentoVenda FormaPagamentoVenda[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FormaPagamentoVenda{
+  id       Int      @id @default(autoincrement())
+  idFormaPagamento Int
+  formaPagamento FormaPagamento? @relation(fields: [idFormaPagamento], references: [id])
+  idVenda Int
+  valor Float
+  venda Vendas? @relation(fields: [idVenda], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -1,35 +1,22 @@
 import { PrismaClient } from "@prisma/client";
+import { createFormaPagamento } from "./seed_pagamento";
+import { createClientes, createFuncionario, createPessoas } from "./seed_pessoas";
+import { createCategory } from "./seed_category";
 
 const prisma = new PrismaClient();
 
+
 async function main() {
-    await prisma.categorias.create({
-        data: {
-            nome: 'Geral',
-        }
-    });
-    await prisma.pessoas.create({
-        data: {
-            nome: 'Admin',
-            cpf: '00000000000',
-            email: '',
-            telefone: '',
-            endereco: '',
-        }
-    });
+    
+    await createPessoas(prisma);
+    await createFuncionario(prisma);
+    await createClientes(prisma);
 
-    await prisma.clientes.create({
-        data: {
-            idPessoas: 1,
-        }
-    });
-
-    await prisma.funcionarios.create({
-        data: {
-            idPessoas: 1,
-        }
-    });
+    await createCategory(prisma);
+    await createFormaPagamento(prisma);
+   
 }
+
 
 main()
   .then(async () => {

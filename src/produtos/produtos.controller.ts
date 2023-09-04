@@ -16,12 +16,7 @@ export class ProdutosController {
         throw error;
       }
     }
-  
-    // @Get(':id')
-    // async getProdutosId(id: number) {
-    //   const produtos = await this.produtosService.getProdutos(id);
-    //   return produtos;
-    // }
+
   
     @Put()
     async updateProdutos(@Body() produto: Produtos) {

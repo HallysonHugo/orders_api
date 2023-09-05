@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 async function createPessoas(prisma: PrismaClient) {
     await prisma.pessoas.create({
         data: {
-            nome: 'Admin',
+            nome: 'Geral',
             cpf: '00000000000',
             email: '',
             telefone: '',
